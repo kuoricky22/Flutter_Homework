@@ -12,7 +12,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
+  // TextEditingController() 綁定並監聽 TextField controller
   var AccountController = TextEditingController();
   var pwdController = TextEditingController();
 
@@ -50,14 +50,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
+                width: MediaQuery.of(context).size.width,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child:
-                  ElevatedButton(
+                  child: ElevatedButton(
                     child: Text(
                       '登入',
                       style: TextStyle(fontSize: 20),
@@ -65,48 +61,47 @@ class _LoginPageState extends State<LoginPage> {
 
                     // 點擊登入按鈕後才會連接API並確認帳號密碼是否錯誤
                     onPressed: () {
-                      // Api.queryAccount(AccountController.text, pwdController.text).then((value) => print(value));
                       Api.queryAccount(
-                          AccountController.text, pwdController.text)
+                              AccountController.text, pwdController.text)
                           .then((value) {
                         var data = Account.fromJson((value));
                         // rs == 0 代表通過
                         // rs == 4 代表失敗
                         if (data.rs == 0) {
-                          Provider.of<LoginProvider>(context, listen: false).loginState(true);
+                          // 使用 Provider.of，並且將 listen 設定為 false(若沒設定，預設為 true)，
+                          // 則不會再次調用 Widget 重新構建（ build ）畫面 ，更省效能。
+                          // 登入成功，登入狀態也會更新
+                          Provider.of<LoginProvider>(context, listen: false)
+                              .loginState(true);
                           showDialog(
                               context: context,
                               builder: (context) {
                                 Future.delayed(Duration(seconds: 1), () {
                                   // 回到 Home 頁面
                                   // pushNamedAndRemoveUntil 會將前面頁面移除
-                                  Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, "/main", (_) => false);
                                 });
                                 return AlertDialog(
-                                  backgroundColor: Colors.grey[800],
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15))
-                                  ),
-                                  content: Container(
-                                    height: 25,
-                                    width: 80,
-                                    child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child:
-                                        Text("登入成功", style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.white),)
-                                    ),
-                                  )
-                                );
-                              }
-                          );
-                        }
-
-                        else {
-                          Provider.of<LoginProvider>(context, listen: false).login(false);
-                          // 跳錯誤訊息
+                                    backgroundColor: Colors.grey,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15))),
+                                    content: Container(
+                                      height: 25,
+                                      width: 80,
+                                      child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "登入成功",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white),
+                                          )),
+                                    ));
+                              });
+                        } else {
+                          // 跳出 "帳號密碼錯誤" 訊息
                           showDialog(
                               context: context,
                               builder: (context) {
@@ -117,27 +112,31 @@ class _LoginPageState extends State<LoginPage> {
                                   backgroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(15))
-                                  ),
+                                          Radius.circular(15))),
                                   content: Column(
                                     // 對齊方式
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     // (看當下是用Column 或 Row) MainAxisSize.min 盡可能縮減高或寬度等於子組件
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      Icon(Icons.announcement_outlined,
-                                        color: Colors.white, size: 30,),
-                                      Padding(padding: EdgeInsets.only(
-                                          right: 20),),
-                                      Text("帳號密碼錯誤", style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.white),),
+                                      Icon(
+                                        Icons.announcement_outlined,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 20),
+                                      ),
+                                      Text(
+                                        "帳號密碼錯誤",
+                                        style: TextStyle(
+                                            fontSize: 20, color: Colors.white),
+                                      ),
                                     ],
                                   ),
                                 );
-                              }
-                          );
+                              });
                         }
                       });
                     },
@@ -146,7 +145,6 @@ class _LoginPageState extends State<LoginPage> {
               )
             ],
           ),
-        )
-    );
+        ));
   }
 }

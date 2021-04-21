@@ -57,30 +57,68 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    //透過 Provider.of 來獲取資料並用變數(login)儲存
     final login = Provider.of<LoginProvider>(context);
-
-    print(login.state);
 
     return Scaffold(
         //最頂部 Tilte
         appBar: AppBar(title: Text('Home'), actions: <Widget>[
-          ElevatedButton(
-            child: Text(
-              (() {
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: ElevatedButton(
+              child: Text(
+                /*  這種用法專業術語稱IIFE(Immediately Invoked Function Expression) 是一個定義完馬上就執行的 function
+                *   ((){
+                *     // your code here
+                *   }())
+                * */
+                (() {
+                  if (login.state == 1) {
+                    return "登出";
+                  }
+                  return "登入";
+                }()),
+                style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                  primary: Colors.white70, shadowColor: Colors.black87),
+              onPressed: () {
                 if (login.state == 1) {
-                  return "登出";
+                  login.loginState(false);
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        // 過1秒自動跳轉到指定頁面
+                        Future.delayed(Duration(seconds: 1), () {
+                          Navigator.pushNamed(context, "/l");
+                        });
+
+                        // 跳出"登入成功"訊息
+                        return AlertDialog(
+                            backgroundColor: Colors.grey,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15))),
+                            content: Container(
+                              height: 25,
+                              width: 80,
+                              child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Text(
+                                    "登出成功",
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white),
+                                  )),
+                            ));
+                      });
+                } else {
+                  Navigator.pushNamed(context, "/l");
                 }
-                return "登入";
-              }()),
-              style: TextStyle(fontSize: 20),
+              },
             ),
-            style: ElevatedButton.styleFrom(shadowColor: Colors.black87),
-            onPressed: () {
-              if(login.state == 1){
-                login.loginState(false);
-              }
-              Navigator.pushNamed(context, "/l");
-            },
           )
         ]),
 
