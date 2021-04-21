@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_homework/ApI/Api.dart';
 import 'package:flutter_homework/Model/Banners.dart';
 import 'package:flutter_homework/Model/News.dart';
+import 'package:flutter_homework/login/loginProvider.dart';
 import 'package:flutter_homework/login/login_page.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:provider/provider.dart';
 
 import 'news_detail.dart';
 
@@ -55,18 +57,31 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final login = Provider.of<LoginProvider>(context);
+
+    print(login.state);
+
     return Scaffold(
         //最頂部 Tilte
         appBar: AppBar(title: Text('Home'), actions: <Widget>[
           ElevatedButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
-              },
-              child: Text(
-                "登入",
-                style: TextStyle(fontSize: 20),
-              ))
+            child: Text(
+              (() {
+                if (login.state == 1) {
+                  return "登出";
+                }
+                return "登入";
+              }()),
+              style: TextStyle(fontSize: 20),
+            ),
+            style: ElevatedButton.styleFrom(shadowColor: Colors.black87),
+            onPressed: () {
+              if(login.state == 1){
+                login.loginState(false);
+              }
+              Navigator.pushNamed(context, "/l");
+            },
+          )
         ]),
 
         // 內容
